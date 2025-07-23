@@ -19,7 +19,7 @@ int result = 0;
     int tipo;      // Para tipo de expressão
 }
 
-%token NUM IDENTIFIER INTEGER ASSGNOP WHILE DO END ELSE FI IF IN LET READ SKIP THEN WRITE
+%token NUM IDENTIFIER INTEGER ASSGNOP WHILE DO END ELSE FI IF IN LET PRINT READ SKIP THEN WRITE
 %token <sval> LT GT EQ NEQ /* Relational Operators: < > = <> */
 %token <sval> AND_OP OR_OP  /* Boolean Operators: && || */
 %type <tipo> expression
@@ -115,7 +115,20 @@ stmt:
         }
     }
   | WHILE M_start_loop condition_statement DO M_after_condition stmts END M_end_loop ';' { }
-  | IF condition_statement THEN stmts END ';' { gen_if(); } /* <-- ADD IF STATEMENT RULE */
+  | IF condition_statement THEN stmts END ';' { gen_if(); }
+  | IF condition_statement THEN stmts ELSE stmts END ';' { gen_if_else(); }
+  | READ IDENTIFIER ';' {
+        if (semantic_check_var($2, yylineno)) {
+            int idx = find_symbol($2);
+            gen_read(symbol_table[idx].address);
+        }
+    }
+  | WRITE expression ';' {
+        gen_write();
+    }
+  | PRINT expression ';' {
+        gen_write();
+    }
 ;
 
 /* Expressoes aceitas */

@@ -1,0 +1,4 @@
+integer x;
+x := 42;
+print x;
+write x;

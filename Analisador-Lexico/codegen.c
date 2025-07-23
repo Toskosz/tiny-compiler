@@ -168,3 +168,33 @@ void gen_relop(const char* op) {
     // Here we just set the flags. The TM instructions JLT, JEQ, etc., test AC.
     // For this simple model, we assume the calling function handles the jump.
 }
+
+void gen_if_else() {
+    emitComment("IF-ELSE: backpatch and setup else");
+    int else_jump = pop_loc();  // Get the location to backpatch
+    int skip_else = emitSkip(1); // Skip location for jump over else part
+    
+    // Backpatch the conditional jump to point to else part
+    int current_loc = emitLoc;
+    emitBackup(else_jump);
+    emitRM("JEQ", AC, current_loc, 0, "Jump to else if condition is false");
+    emitRestore();
+    
+    // After else statements, backpatch the skip jump
+    current_loc = emitLoc;
+    emitBackup(skip_else);
+    emitRM("LDC", PC, current_loc, 0, "Jump over else part");
+    emitRestore();
+    emitComment("IF-ELSE: end");
+}
+
+void gen_read(int address) {
+    emitComment("READ: input value");
+    emitRO("IN", AC, 0, 0, "Read integer from input");
+    emitRM("ST", AC, address, GP, "Store input value to variable");
+}
+
+void gen_write() {
+    emitComment("WRITE: output value");
+    emitRO("OUT", AC, 0, 0, "Write AC to output");
+}

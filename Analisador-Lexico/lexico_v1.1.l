@@ -39,6 +39,7 @@ if        {return IF;}
 in        {return IN;}
 integer   {return INTEGER;}
 let       {return LET;}
+print     {return PRINT;}
 read      {return READ;}
 skip      {return SKIP;}
 then      {return THEN;}
